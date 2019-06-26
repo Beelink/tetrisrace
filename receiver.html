@@ -17,10 +17,15 @@
           border-top: 5px solid black;
           border-bottom: 5px solid black;
       }
+
+      h2{
+          text-align: center;
+      }
     </style>
   </head>
   <body> 
     <div>
+        <h2>Score: <span id="score_value">0</span></h2>
       <canvas id="div_canvas" width="1100" height="400"></canvas>
     </div>
     <script>
@@ -31,6 +36,9 @@
         var position = Math.floor(height/2);
         var block = [];
         var speed = 10;
+        var game = true;
+        var score = 0;
+        var score_value = document.getElementById("score_value");
   
         var mainCharacter = new MainCharacter();
   
@@ -46,7 +54,7 @@
                 break;
               case "down": mainCharacter.down();
                 break;
-              case "menu": menu();
+              case "restart": restart();
                 break;
             }
           });
@@ -67,9 +75,9 @@
   
             this.drawBlock = function(){
                 ctx.beginPath();
-                ctx.fillRect(selfBlock.x, selfBlock.y, selfBlock.width, selfBlock.height);
+                ctx.strokeRect(selfBlock.x, selfBlock.y, selfBlock.width, selfBlock.height);
                 ctx.fillStyle = selfBlock.color;
-                ctx.fill();
+                ctx.stroke();
                 ctx.closePath();
             }
   
@@ -131,23 +139,38 @@
   
             ctx.clearRect(0, 0, width, height);
             mainCharacter.draw();
-            for(let i = 0; i < block.length; i++){
-                block[i].draw();
-                // console.log(i);
+            for(let i = 0; i < block.length; i++){ 
+                    if((width - block[i].x > 0) && (block[i].x == mainCharacter.x + mainCharacter.width) && (block[i].y == mainCharacter.y)){
+                        console.log('------------------------------------');
+                        console.log(block[i].y + " " + (mainCharacter.y + mainCharacter.width));
+                        console.log(block[i].x + " " + (mainCharacter.x + mainCharacter.width) + " " + i);
+                        console.log('------------------------------------');
+                        alert("crash")
+                        game = false;
+                    }
+                    block[i].draw();
             }
-            // block.shift();
+
+            score++;
+            score_value.innerHTML = score;
   
         }
   
         function animationShowBlock(){
             console.log("hello");
             let timeId = setInterval(function(){
-                let random = 50 * getRandomInt(1, 9);
-                block.push(new Block(width,random, 100, 50));
+
+                if(!game) clearInterval(timeId);
+
+                let random = 50 * getRandomInt(1, 8);
+                block.push(new Block(width, random, 100, 50));
                 console.log(block);
             }, 5000);
-  
-            setInterval(animation, speed);
+
+            let timeAnimation = setInterval(function(){
+                if(!game) clearInterval(timeAnimation);
+                animation();
+            }, speed);
             
             console.log('------------------------------------');
             console.log(block);
@@ -158,30 +181,32 @@
             return Math.floor(Math.random() * (max - min)) + min;
         }
   
-        function changeDirection(e){
-            console.log("hello");
-            if(e.keyCode == 37 ){
-                mainCharacter.left();
-            }
-            if(e.keyCode == 38){
-                mainCharacter.up();
-            }
-            if(e.keyCode == 39){
-                mainCharacter.right();
-            }
-            if(e.keyCode == 40){
-                mainCharacter.down();
-            }
+        // function changeDirection(e){
+        //     console.log("hello");
+        //     if(e.keyCode == 37 ){
+        //         mainCharacter.left();
+        //     }
+        //     if(e.keyCode == 38){
+        //         mainCharacter.up();
+        //     }
+        //     if(e.keyCode == 39){
+        //         mainCharacter.right();
+        //     }
+        //     if(e.keyCode == 40){
+        //         mainCharacter.down();
+        //     }
   
-        }
+        // }
   
-        function menu() {
-            
+        function restart() {
+            block = [];
+            score = 0;
+
         }
   
         window.onload = () => {
   
-            document.addEventListener("keydown", changeDirection);
+            // document.addEventListener("keydown", changeDirection);
             animationShowBlock();
   
         }
