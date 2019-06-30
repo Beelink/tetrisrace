@@ -9,13 +9,12 @@
     <script src="/socket.io/socket.io.js"></script>
     <style>
       div {
-          width: 1100px;
+          width: 800px;
           margin: 50px auto;
       }
 
       #div_canvas {
-          border-top: 5px solid black;
-          border-bottom: 5px solid black;
+          border: 5px solid black;
       }
 
       h2{
@@ -26,7 +25,7 @@
   <body> 
     <div>
         <h2>Score: <span id="score_value">0</span></h2>
-      <canvas id="div_canvas" width="1100" height="400"></canvas>
+      <canvas id="div_canvas" width="800" height="400"></canvas>
     </div>
     <script>
         var canvas = document.getElementById("div_canvas");
@@ -41,13 +40,9 @@
         var score_value = document.getElementById("score_value");
 
         var background = new Image();
-        background.src = "img/background.png";
-
-        // Make sure the image is loaded first otherwise nothing will draw.
-        background.onload = function() {
-            ctx.drawImage(background,0,0);   
-        }
-  
+        background.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/background.png";
+        var backgroundPattern = ctx.createPattern(background, 'repeat');
+        
         var mainCharacter = new MainCharacter();
   
         var socket = io.connect('http://localhost:8080/');
@@ -68,18 +63,12 @@
           });
   
         function Block(x, y, width, height){
-  
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
             this.color = "black"
             let selfBlock = this;
-  
-  
-            // console.log('------------------------------------');
-            // // console.log(self);
-            // console.log('------------------------------------');
   
             this.drawBlock = function(){
                 ctx.beginPath();
@@ -91,14 +80,11 @@
   
             this.draw = function(){
                 selfBlock.drawBlock();
-  
                 selfBlock.x += -2;
             }
-  
         }
   
         function MainCharacter() {
-  
             this.x = 0;
             this.y = Math.floor(height / 2);
             this.width = 100;
@@ -144,8 +130,10 @@
         }
   
         function animation() {
-  
-            ctx.clearRect(0, 0, width, height);
+            // ctx.drawImage(background,0,0);   
+            // ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = backgroundPattern;
+            ctx.fillRect(0, 0, width, height);
             mainCharacter.draw();
             for(let i = 0; i < block.length; i++){ 
                     if((width - block[i].x > 0) && (block[i].x == mainCharacter.x + mainCharacter.width) && (block[i].y == mainCharacter.y)){
