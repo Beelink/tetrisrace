@@ -1,209 +1,188 @@
 <!DOCTYPE html>
 <html lang="en"></html>
 <html> 
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Receiver</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <style>
-      div {
-          width: 800px;
-          margin: 50px auto;
-      }
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Receiver</title>
+        <script src="/socket.io/socket.io.js"></script>
+        <style>
+            div {
+                width: 800px;
+                margin: 50px auto;
+            }
 
-      #div_canvas {
-          border: 5px solid black;
-      }
+            #div_canvas {
+                border: 5px solid black;
+            }
 
-      h2{
-          text-align: center;
-      }
-    </style>
-  </head>
-  <body> 
-    <div>
-        <h2>Score: <span id="score_value">0</span></h2>
-      <canvas id="div_canvas" width="800" height="400"></canvas>
-    </div>
-    <script>
-        var canvas = document.getElementById("div_canvas");
-        var ctx = canvas.getContext("2d");
-        var height = canvas.height;
-        var width = canvas.width;
-        var position = Math.floor(height/2);
-        var block = [];
-        var speed = 10;
-        var game = true;
-        var score = 0;
-        var score_value = document.getElementById("score_value");
+            span {
+                font-weight: bold;
+                font-family: Helvetica;
+            }
+        </style>
+    </head>
+    <body> 
+        <div>
+            <span id="score_value">0</span>
+            <canvas id="div_canvas" width="800" height="300"></canvas>
+        </div>
+        <script>
+            var canvas = document.getElementById("div_canvas");
+            var ctx = canvas.getContext("2d");
+            var height = canvas.height;
+            var width = canvas.width;
+            var position = Math.floor(height / 2);
+            var block = [];
+            var speed = 10;
+            var game = true;
+            var score = 0;
+            var score_value = document.getElementById("score_value");
 
-        var background = new Image();
-        background.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/background.png";
-        var backgroundPattern = ctx.createPattern(background, 'repeat');
-        
-        var mainCharacter = new MainCharacter();
-  
-        var socket = io.connect('http://localhost:8080/');
-  
-        socket.on('Done', function (data){
-            switch(data['Name']) {
-              case "left": mainCharacter.left();
-                break;
-              case "right": mainCharacter.right();
-                break;
-              case "up": mainCharacter.up();
-                break;
-              case "down": mainCharacter.down();
-                break;
-              case "restart": restart();
-                break;
-            }
-          });
-  
-        function Block(x, y, width, height){
-            this.x = x;
-            this.y = y;
-            this.width = width;
-            this.height = height;
-            this.color = "black"
-            let selfBlock = this;
-  
-            this.drawBlock = function(){
-                ctx.beginPath();
-                ctx.strokeRect(selfBlock.x, selfBlock.y, selfBlock.width, selfBlock.height);
-                ctx.fillStyle = selfBlock.color;
-                ctx.stroke();
-                ctx.closePath();
-            }
-  
-            this.draw = function(){
-                selfBlock.drawBlock();
-                selfBlock.x += -2;
-            }
-        }
-  
-        function MainCharacter() {
-            this.x = 0;
-            this.y = Math.floor(height / 2);
-            this.width = 100;
-            this.height = 50;
-            this.color = "black"
-            let self = this;
-  
-            this.drawMainCharacter = function(){
-                ctx.beginPath();
-                ctx.fillRect(self.x, self.y, self.width, self.height);
-                ctx.fillStyle = self.color;
-                ctx.fill();
-                ctx.closePath();
-            }
-  
-            this.draw = function(){
-                self.drawMainCharacter();
-            }
-  
-            this.right = function(){
-                if(self.x + self.width < width){
-                    self.x += 50;
+            var background = new Image();
+            background.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/background.png";
+            var backgroundPattern = ctx.createPattern(background, 'repeat');
+
+            var foreground = new Image();
+            foreground.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/foreground.png";
+            var foregroundPattern = ctx.createPattern(foreground, 'repeat');
+            
+            var mainCharacter = new MainCharacter();
+    
+            var socket = io.connect('http://localhost:8080/');
+    
+            socket.on('Done', function (data) {
+                switch(data['Name']) {
+                case "left": mainCharacter.left();
+                    break;
+                case "right": mainCharacter.right();
+                    break;
+                case "up": mainCharacter.up();
+                    break;
+                case "down": mainCharacter.down();
+                    break;
+                case "restart": restart();
+                    break;
+                }
+            });
+    
+            function Block(x, y, width, height) {
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+                this.color = "black"
+                let selfBlock = this;
+    
+                this.drawBlock = function() {
+                    ctx.beginPath();
+                    ctx.fillStyle = foregroundPattern;
+                    ctx.fillRect(selfBlock.x, selfBlock.y, selfBlock.width, selfBlock.height);
+                    ctx.closePath();
+                }
+    
+                this.draw = function() {
+                    selfBlock.drawBlock();
+                    selfBlock.x -= 5;
+
+                    if(selfBlock.x < - selfBlock.width) {
+                        for(let i = 0; i < block.length; i++) {
+                            if(block[i] == selfBlock) {
+                                block.splice(i, 1);
+                            }
+                        }
+                    }
                 }
             }
-  
-            this.left = function(){
-                if(self.x > 0){
-                    self.x += -50;
+    
+            function MainCharacter() {
+                this.x = 0;
+                this.y = Math.floor(height / 2);
+                this.width = 100;
+                this.height = 50;
+                this.color = "black"
+                let self = this;
+    
+                this.drawMainCharacter = function() {
+                    ctx.beginPath();
+                    ctx.fillStyle = foregroundPattern;
+                    ctx.fillRect(self.x, self.y, self.width, self.height);
+                    ctx.closePath();
+                }
+    
+                this.draw = function() {
+                    self.drawMainCharacter();
+                }
+    
+                this.right = function() {
+                    if(self.x + self.width < width) {
+                        self.x += 50;
+                    }
+                }
+    
+                this.left = function() {
+                    if(self.x > 0) {
+                        self.x += -50;
+                    }
+                }
+    
+                this.down = function() {
+                    if(self.y + self.height < height) {
+                        self.y += 50;
+                    }
+                }
+    
+                this.up = function() {
+                    if(self.y > 0) {
+                        self.y += -50;
+                    }
                 }
             }
-  
-            this.down = function(){
-                if(self.y + self.height < height){
-                    self.y += 50;
-                }
-            }
-  
-            this.up = function(){
-                if(self.y > 0){
-                    self.y += -50;
-                }
-            }
-        }
-  
-        function animation() {
-            // ctx.drawImage(background,0,0);   
-            // ctx.clearRect(0, 0, width, height);
-            ctx.fillStyle = backgroundPattern;
-            ctx.fillRect(0, 0, width, height);
-            mainCharacter.draw();
-            for(let i = 0; i < block.length; i++){ 
-                    if((width - block[i].x > 0) && (block[i].x == mainCharacter.x + mainCharacter.width) && (block[i].y == mainCharacter.y)){
-                        console.log('------------------------------------');
-                        console.log(block[i].y + " " + (mainCharacter.y + mainCharacter.width));
-                        console.log(block[i].x + " " + (mainCharacter.x + mainCharacter.width) + " " + i);
-                        console.log('------------------------------------');
-                        alert("crash")
+    
+            function animation() {
+                ctx.fillStyle = backgroundPattern;
+                ctx.fillRect(0, 0, width, height);
+                mainCharacter.draw();
+                for(let i = 0; i < block.length; i++) { 
+                    if((width - block[i].x > 0) && (block[i].x == mainCharacter.x + mainCharacter.width) && (block[i].y == mainCharacter.y)) {
+                        score_value.innerHTML = "Crash! Score: " + score; 
                         game = false;
                     }
                     block[i].draw();
+                }
+                if(game) {
+                    score++;
+                    score_value.innerHTML = "Score: " + score;
+                }
             }
+    
+            function animationShowBlock() {
+                let timeId = setInterval(function() {
+                    if(!game) clearInterval(timeId);
 
-            score++;
-            score_value.innerHTML = score;
-  
-        }
-  
-        function animationShowBlock(){
-            console.log("hello");
-            let timeId = setInterval(function(){
+                    let random = 50 * getRandomInt(1, 8);
+                    block.push(new Block(width, random, 100, 50));
+                    console.log(block);
+                }, 1000);
 
-                if(!game) clearInterval(timeId);
-
-                let random = 50 * getRandomInt(1, 8);
-                block.push(new Block(width, random, 100, 50));
-                console.log(block);
-            }, 5000);
-
-            let timeAnimation = setInterval(function(){
-                if(!game) clearInterval(timeAnimation);
-                animation();
-            }, speed);
-            
-            console.log('------------------------------------');
-            console.log(block);
-            console.log('------------------------------------');
-        }
-  
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min)) + min;
-        }
-  
-        // function changeDirection(e){
-        //     console.log("hello");
-        //     if(e.keyCode == 37 ){
-        //         mainCharacter.left();
-        //     }
-        //     if(e.keyCode == 38){
-        //         mainCharacter.up();
-        //     }
-        //     if(e.keyCode == 39){
-        //         mainCharacter.right();
-        //     }
-        //     if(e.keyCode == 40){
-        //         mainCharacter.down();
-        //     }
-  
-        // }
-  
-        function restart() {
-            // block = [];
-            // score = 0;
-            location.reload();
-        }   
-  
-        window.onload = () => {
-            // document.addEventListener("keydown", changeDirection);
-            animationShowBlock();
-        }
-      </script>
-  </body>
+                let timeAnimation = setInterval(function() {
+                    if(!game) clearInterval(timeAnimation);
+                    animation();
+                }, speed);
+            }
+    
+            function getRandomInt(min, max) {
+                return Math.floor(Math.random() * (max - min)) + min;
+            }
+    
+            function restart() {
+                location.reload();
+            }   
+    
+            window.onload = () => {
+                animationShowBlock();
+            }
+        </script>
+    </body>
 </html>

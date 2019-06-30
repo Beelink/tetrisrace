@@ -1,10 +1,15 @@
-var app = require('express')() 
-  , fs = require('fs')
-  , server = require('http').createServer(app)
-  , io = require('socket.io').listen(server);
-server.listen(8080);
+const express = require('express'),
+  app = express(),
+  fs = require('fs'),
+  server = require('http').createServer(app),
+  io = require('socket.io').listen(server),
+  PORT = process.env.PORT = 8080;
 
-app.get('/', function(req, res, next){
+server.listen(PORT, () => {
+  console.log('Server is running at: ', PORT);
+});
+
+app.get('/', function(req, res, next) {
   fs.readFile(__dirname + '/sender.html', function (err, data) {
     if (err) next();
     res.writeHead(200);
@@ -12,7 +17,7 @@ app.get('/', function(req, res, next){
   });
 });
 
-app.get('/receiver', function(req, res, next){
+app.get('/receiver', function(req, res, next) {
   fs.readFile(__dirname + '/receiver.html', function (err, data) {
     if (err) next();
     res.writeHead(200);

@@ -9,56 +9,56 @@
 			var socket = io.connect('http://localhost:8080/');
 
 			function sendMessage(sendedMessage) {
-				socket.emit('Send', { 'Name' : sendedMessage });
+				socket.emit('Send', { 'Name': sendedMessage });
 			}
 			
 			socket.on('Done', function (data) {
 				console.log('sended');
 			});
 		</script>
-<style type="text/css" media="screen">
+		<style type="text/css" media="screen">
+			#main-container {
+				position: relative;
+			}
 
-	#main-container {
-		position: relative;
-	}
+			button, img {
+				position: absolute;
+				/* width: 25%;
+				height: 25%; */
+				margin: 16px;
+			}
 
-	button {
-		position: absolute;
-		width: 25%;
-		height: 25%;
-		margin: 16px;
-	}
+			#left-btn {
+				left: 0;
+				top: 35%;
+				/* transform: rotate(-90deg); */
+			}
 
-	#left-btn {
-		left: 0;
-		top: 35%;
-	}
+			#right-btn {
+				right: 0;
+				top: 35%;
+			}
 
-	#right-btn {
-		right: 0;
-		top: 35%;
-	}
+			#up-btn {
+				top: 0;
+				left: 37.5%;
+			}
 
-	#up-btn {
-		top: 0;
-		left: 37.5%;
-	}
+			#down-btn {
+				bottom: 0;
+				left: 37.5%;
+			}
 
-	#down-btn {
-		bottom: 0;
-		left: 37.5%;
-	}
+			#menu-btn {
+				left: 37.5%;
+				top: 35%;
+			}
 
-	#menu-btn {
-		left: 37.5%;
-		top: 35%;
-	}
-
-</style>
+		</style>
 	</head>
 	<body> 
 		<center class="main-container">
-			<button id="left-btn" onclick="sendMessage('left')">Left</button>
+			<img src="https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/arrow.png" id="left-btn" onclick="sendMessage('left')">
 			<button id="right-btn" onclick="sendMessage('right')">Right</button>
 			<button id="up-btn" onclick="sendMessage('up')">Up</button>
 			<button id="down-btn" onclick="sendMessage('down')">Down</button>
