@@ -5,16 +5,33 @@
 		<title>Sender</title>
 		<script src="/socket.io/socket.io.js"></script>
 		<script type="text/javascript" charset="utf-8">
-
 			var socket = io.connect('http://localhost:8080/');
 
 			function sendMessage(sendedMessage) {
 				socket.emit('Send', { 'Name': sendedMessage });
 			}
+
+			function checkKey(e) {
+				e = e || window.event;
+
+				if (e.keyCode == '38') {
+					sendMessage('up');
+				} else if (e.keyCode == '40') {
+					sendMessage('down');
+				} else if (e.keyCode == '37') {
+					sendMessage('left');
+				} else if (e.keyCode == '39') {
+					sendMessage('right');
+				} else if (e.keyCode == '13') {
+					sendMessage('restart');
+				}
+			}
 			
 			socket.on('Done', function (data) {
 				console.log('sended');
 			});
+
+			document.onkeydown = checkKey;
 		</script>
 		<style type="text/css" media="screen">
 			#main-container {
@@ -23,7 +40,6 @@
 
 			img {
 				position: absolute;
-				margin: 16px;
 			}
 
 			img:hover {
@@ -35,26 +51,24 @@
 			}
 
 			#left-btn {
-				left: 0;
+				left: 16px;
 				top: calc(50% - 75px);
-				transform: rotate(-90deg);
 			}
 
 			#right-btn {
-				right: 0;
+				right: 16px;
 				top: calc(50% - 75px);
-				transform: rotate(90deg);
+	
 			}
 
 			#up-btn {
 				left: calc(50% - 75px);
-				top: 0;
+				top: 16px;
 			}
 
 			#down-btn {
 				left: calc(50% - 75px);
-				bottom: 0;
-				transform: rotate(180deg);
+				bottom: 16px;
 			}
 
 			#restart-btn {
