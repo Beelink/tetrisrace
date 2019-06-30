@@ -39,6 +39,14 @@
         var game = true;
         var score = 0;
         var score_value = document.getElementById("score_value");
+
+        var background = new Image();
+        background.src = "img/background.png";
+
+        // Make sure the image is loaded first otherwise nothing will draw.
+        background.onload = function() {
+            ctx.drawImage(background,0,0);   
+        }
   
         var mainCharacter = new MainCharacter();
   
@@ -199,16 +207,14 @@
         // }
   
         function restart() {
-            block = [];
-            score = 0;
-
-        }
+            // block = [];
+            // score = 0;
+            location.reload();
+        }   
   
         window.onload = () => {
-  
             // document.addEventListener("keydown", changeDirection);
             animationShowBlock();
-  
         }
       </script>
   </body>
