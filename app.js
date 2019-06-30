@@ -5,6 +5,8 @@ const express = require('express'),
   io = require('socket.io').listen(server),
   PORT = process.env.PORT = 8080;
 
+// app.use(express.static('public'));
+
 server.listen(PORT, () => {
   console.log('Server is running at: ', PORT);
 });

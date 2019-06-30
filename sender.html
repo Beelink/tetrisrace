@@ -21,37 +21,45 @@
 				position: relative;
 			}
 
-			button, img {
+			img {
 				position: absolute;
-				/* width: 25%;
-				height: 25%; */
 				margin: 16px;
+			}
+
+			img:hover {
+				opacity: 0.5;
+			}
+
+			img:active {
+				transform: scale(0.9);
 			}
 
 			#left-btn {
 				left: 0;
-				top: 35%;
-				/* transform: rotate(-90deg); */
+				top: calc(50% - 75px);
+				transform: rotate(-90deg);
 			}
 
 			#right-btn {
 				right: 0;
-				top: 35%;
+				top: calc(50% - 75px);
+				transform: rotate(90deg);
 			}
 
 			#up-btn {
+				left: calc(50% - 75px);
 				top: 0;
-				left: 37.5%;
 			}
 
 			#down-btn {
+				left: calc(50% - 75px);
 				bottom: 0;
-				left: 37.5%;
+				transform: rotate(180deg);
 			}
 
-			#menu-btn {
-				left: 37.5%;
-				top: 35%;
+			#restart-btn {
+				left: calc(50% - 75px);
+				top: calc(50% - 75px);
 			}
 
 		</style>
@@ -59,10 +67,10 @@
 	<body> 
 		<center class="main-container">
 			<img src="https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/arrow.png" id="left-btn" onclick="sendMessage('left')">
-			<button id="right-btn" onclick="sendMessage('right')">Right</button>
-			<button id="up-btn" onclick="sendMessage('up')">Up</button>
-			<button id="down-btn" onclick="sendMessage('down')">Down</button>
-			<button id="menu-btn" onclick="sendMessage('restart')">Restart</button>
+			<img src="https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/arrow.png" id="right-btn" onclick="sendMessage('right')">
+			<img src="https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/arrow.png" id="up-btn" onclick="sendMessage('up')">
+			<img src="https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/arrow.png" id="down-btn" onclick="sendMessage('down')">
+			<img src="https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/restart.png" id="restart-btn" onclick="sendMessage('restart')">
 		</center>
 	</body>
 </html>
