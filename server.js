@@ -5,7 +5,7 @@ const express = require('express'),
   io = require('socket.io').listen(server),
   PORT = process.env.PORT = 8080;
 
-// app.use(express.static('public'));
+app.use('/', express.static(__dirname + '/public'));
 
 server.listen(PORT, () => {
   console.log('Server is running at: ', PORT);
@@ -28,7 +28,8 @@ app.get('/receiver', function(req, res, next) {
 });
 
 io.sockets.on('connection', function (socket) {
-  socket.on('Send', function (data){
-      io.sockets.emit('Done', { 'Name': data['Name']});
+  socket.on('request-message', function (data){
+      io.sockets.emit('send-message', { message: data['message'] });
+      console.log("send-message = " + data['message']);
   });
 });

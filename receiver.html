@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<html lang="en"></html>
 <html> 
     <head>
         <meta charset="UTF-8">
@@ -48,19 +47,22 @@
             var dificulty = 1;
 
             var background = new Image();
-            background.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/background.png";
+            // background.src = "img/background.png";
+            background.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/public/img/background.png";
             var backgroundPattern = ctx.createPattern(background, 'repeat');
 
             var foreground = new Image();
-            foreground.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/foreground.png";
+            // foreground.src = "img/foreground.png";
+            foreground.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/public/img/foreground.png";
             var foregroundPattern = ctx.createPattern(foreground, 'repeat');
             
             var mainCharacter = new MainCharacter();
     
-            var socket = io.connect('http://localhost:8080/');
+            var socket = io('http://localhost:8080');
     
-            socket.on('Done', function (data) {
-                switch(data['Name']) {
+            socket.on('send-message', function (data) {
+                console.log("done-message = " + data['message']);
+                switch(data['message']) {
                 case "left": mainCharacter.left();
                     break;
                 case "right": mainCharacter.right();
@@ -188,7 +190,7 @@
                 }
             }
     
-            function animationShowBlock() {
+            function startGame() {
                 let timeId = setInterval(function() {
                     if(!game) clearInterval(timeId);
 
@@ -211,7 +213,7 @@
             }   
     
             window.onload = () => {
-                animationShowBlock();
+                startGame();
             }
         </script>
     </body>
