@@ -22,11 +22,16 @@
                 font-family: Helvetica;
                 font-size: 32px;
             }
+
+            #dificulty_value {
+                float: right;
+            }
         </style>
     </head>
     <body> 
         <div>
-            <span id="score_value">0</span>
+            <span id="score_value"></span>
+            <span id="dificulty_value"></span>
             <canvas id="div_canvas" width="800" height="300"></canvas>
         </div>
         <script>
@@ -36,10 +41,11 @@
             var width = canvas.width;
             var position = Math.floor(height / 2);
             var block = [];
-            var speed = 10;
             var game = true;
             var score = 0;
             var score_value = document.getElementById("score_value");
+            var dificulty_value = document.getElementById("dificulty_value");
+            var dificulty = 1;
 
             var background = new Image();
             background.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/img/background.png";
@@ -85,7 +91,7 @@
     
                 this.draw = function() {
                     selfBlock.drawBlock();
-                    selfBlock.x -= 5;
+                    selfBlock.x -= dificulty;
 
                     if(selfBlock.x < - selfBlock.width) {
                         for(let i = 0; i < block.length; i++) {
@@ -104,8 +110,23 @@
                 this.height = 50;
                 this.color = "black"
                 let self = this;
+                this.targetX = self.x;
+                this.targetY = self.y;
     
                 this.drawMainCharacter = function() {
+                    if(self.x < self.targetX) {
+                        self.x += 10;
+                    }
+                    if(self.x > self.targetX) {
+                        self.x -= 10;
+                    }
+                    if(self.y < self.targetY) {
+                        self.y += 10;
+                    }
+                    if(self.y > self.targetY) {
+                        self.y -= 10;
+                    }
+
                     ctx.beginPath();
                     ctx.fillStyle = foregroundPattern;
                     ctx.fillRect(self.x, self.y, self.width, self.height);
@@ -117,44 +138,53 @@
                 }
     
                 this.right = function() {
-                    if(self.x + self.width < width) {
-                        self.x += 50;
+                    if(self.targetX + self.width < width) {
+                        self.targetX += 50;
                     }
                 }
     
                 this.left = function() {
-                    if(self.x > 0) {
-                        self.x += -50;
+                    if(self.targetX > 0) {
+                        self.targetX += -50;
                     }
                 }
     
                 this.down = function() {
-                    if(self.y + self.height < height) {
-                        self.y += 50;
+                    if(self.targetY + self.height < height) {
+                        self.targetY += 50;
                     }
                 }
     
                 this.up = function() {
-                    if(self.y > 0) {
-                        self.y += -50;
+                    if(self.targetY > 0) {
+                        self.targetY += -50;
                     }
                 }
             }
     
             function animation() {
-                ctx.fillStyle = backgroundPattern;
-                ctx.fillRect(0, 0, width, height);
-                mainCharacter.draw();
-                for(let i = 0; i < block.length; i++) { 
-                    if((width - block[i].x > 0) && (block[i].x == mainCharacter.x + mainCharacter.width) && (block[i].y == mainCharacter.y)) {
-                        score_value.innerHTML = "Crash! Score: " + score; 
-                        game = false;
-                    }
-                    block[i].draw();
-                }
                 if(game) {
+                    ctx.fillStyle = backgroundPattern;
+                    ctx.fillRect(0, 0, width, height);
+                    mainCharacter.draw();
+                    for(let i = 0; i < block.length; i++) { 
+                        if(block[i].y == mainCharacter.y) {
+                            if(block[i].x < mainCharacter.x + mainCharacter.width && block[i].x + block[i].width > mainCharacter.x) {
+                                game = false;
+                            }
+                        }
+                        block[i].draw();
+                    }
                     score++;
                     score_value.innerHTML = "Score: " + score;
+
+                    dificulty += 0.001;
+                    dificulty_value.innerHTML = "Speed: x" + Math.round(dificulty * 100) / 100;
+                } else {
+                    score_value.innerHTML = "Crash! Total: " + score; 
+                            
+                    ctx.fillStyle = foregroundPattern;
+                    ctx.fillRect(0, 0, width, height);
                 }
             }
     
@@ -162,15 +192,14 @@
                 let timeId = setInterval(function() {
                     if(!game) clearInterval(timeId);
 
-                    let random = 50 * getRandomInt(1, 8);
+                    let random = 50 * getRandomInt(1, 6);
                     block.push(new Block(width, random, 100, 50));
-                    console.log(block);
                 }, 1000);
 
                 let timeAnimation = setInterval(function() {
                     if(!game) clearInterval(timeAnimation);
                     animation();
-                }, speed);
+                }, 10);
             }
     
             function getRandomInt(min, max) {
