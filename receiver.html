@@ -67,8 +67,43 @@
                 }
             });
 
-            function HardBlock(x, y, width, height, game) {
+            function HardBlock(x1, y1, width1, height1, game, targetY) {
+                let x = x1;
+                let y = y1;
+                let width = width1;
+                let height = height1;
 
+                this.getWidth = function() {
+                    return width;
+                }
+
+                this.getHeight = function() {
+                    return height;
+                }
+
+                this.getX = function() {
+                    return x;
+                }
+            
+                this.getY = function() {
+                    return y;
+                }
+
+                this.draw = function() {
+                    x -= game.getDificulty();
+                    
+                    if(y > targetY) {
+                        y--;
+                    }
+                    if(y < targetY) {
+                        y++;
+                    }
+
+                    game.getCtx().beginPath();
+                    game.getCtx().fillStyle = "rgb(184, 63, 72)";
+                    game.getCtx().fillRect(x, y, width, height);
+                    game.getCtx().closePath();
+                }
             }
     
             function EasyBlock(x1, y1, width1, height1, game) {
