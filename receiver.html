@@ -25,12 +25,25 @@
             #dificulty_value {
                 float: right;
             }
+
+            #type_difficulty{
+                width: 100px;
+                height: 50px;
+                background: rgb(0, 165, 0);
+                border: none;
+                font-size: 20px;
+                color: white;
+                position: absolute;
+                left: 50%;
+                margin: -25px 0 0 -50px; 
+            }
         </style>
     </head>
     <body> 
         <div>
             <span id="score_value"></span>
             <span id="dificulty_value"></span>
+            <button id="type_difficulty" onclick="changeTypeDifficulty()">Easy</button>
             <canvas id="div_canvas" width="800" height="300"></canvas>
         </div>
         <script>    
@@ -49,12 +62,13 @@
             foreground.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/public/img/foreground.png";
             var foregroundPattern = game.ctx.createPattern(foreground, 'repeat'); 
             var position = Math.floor(game.height / 2);
-                var blocks = [];
+            var blocks = [];
                 
-                var score = 0;
-                var score_value = document.getElementById("score_value");
-                var dificulty_value = document.getElementById("dificulty_value");
-                var dificulty = 1;        
+            var score = 0;
+            var score_value = document.getElementById("score_value");
+            var dificulty_value = document.getElementById("dificulty_value");
+            var dificulty = 1;    
+                
             
             socket.on('send-message', function (data) {
                 console.log("done-message = " + data['message']);
@@ -72,15 +86,17 @@
                 }
             });
     
-            function Block(x, y, width, height) {
+            function Block(x, y, width, height, mainY) {
                 this.x = x;
                 this.y = y;
                 this.width = width;
                 this.height = height;
                 this.color = "black"
-                let selfBlock = this;
+                this.mainY = mainY;
+
     
                 this.drawBlock = function() {
+                    // console.log(this.mainX + " " + this.mainY);
                     game.ctx.beginPath();
                     game.ctx.fillStyle = foregroundPattern;
                     game.ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -90,6 +106,15 @@
                 this.draw = function() {
                     this.drawBlock.call(this);
                     this.x -= dificulty;
+                    if(!game.easy_complexity){
+                        if(this.y == this.mainY){
+                            return ;
+                        }else if(this.y > this.mainY){
+                            this.y -= 0.5;
+                        }else{
+                            this.y += 0.5;
+                        }
+                    }
 
                     if(this.x < - this.width) {
                         for(let i = 0; i < blocks.length; i++) {
@@ -141,7 +166,7 @@
                 }
     
                 this.right = function() {
-                    if(this.targetX + this.width < width) {
+                    if(this.targetX + this.width < game.width) {
                         this.targetX += 50;
                     }
                 }
@@ -153,7 +178,7 @@
                 }
     
                 this.down = function() {
-                    if(this.targetY + this.height < height) {
+                    if(this.targetY + this.height < game.height) {
                         this.targetY += 50;
                     }
                 }
@@ -171,6 +196,7 @@
                 this.height = this.canvas.height;
                 this.width = this.canvas.width;
                 this.play = true;
+                this.easy_complexity = true;
                                 
                 this.removeBlock = function(items, i){
                     items.splice(i, 1);
@@ -208,28 +234,26 @@
                     }
                     // requestAnimationFrame(this.animation);
                 }
-
-                let animationBind = this.animation.bind(this);
-        
-                this.startGame = function() {
+                
+                this.startGame = function(){
+                let animationGame = game.animation.bind(game);
                     // console.log(this);
-                    let timeId = setInterval(function() {
-                        if(!game) clearInterval(timeId);
-
+                    function addedBlock(){
                         let random = 50 * getRandomInt(1, 6);
-                        blocks.push(new Block(this.width, random, 100, 50));
-                    }, 5000);
+                        blocks.push(new Block(this.width, random, 100, 50, mainCharacter.y));
+                    }
 
-                    let timeAnimation = setInterval(function() {
-                        if(!game) clearInterval(timeAnimation);
-                        animationBind();
-                    }, 10);
+                    function callAnimationGame(){
+                        if(!this.play) clearInterval(timeAnimation);
+                        animationGame();
+                    }
+                    let timeId = setInterval(addedBlock.bind(this), 5000);
+
+                    let timeAnimation = setInterval(callAnimationGame.bind(this), 10);
                     // requestAnimationFrame(this.animation.bind(this));
                     // requestAnimationFrame(animationBind)
                 
-                }
-        
-                
+            }
                   
             }   
     
@@ -241,13 +265,24 @@
                 location.reload();
             } 
 
+            function changeTypeDifficulty(){
+                if(document.getElementById("type_difficulty").innerHTML == "Easy"){
+                    game.easy_complexity = false;
+                    document.getElementById("type_difficulty").innerHTML = "Hard";
+                    document.getElementById("type_difficulty").style.background = "red";
+                }else{
+                    game.easy_complexity = true;
+                    document.getElementById("type_difficulty").innerHTML = "Easy";
+                    document.getElementById("type_difficulty").style.background = "green";
+                }
+            }
+
             window.onload = () => {
                 let random = 50 * getRandomInt(1, 6);
-                var start = game.startGame.bind(game);
+                blocks.push(new Block(game.width, random, 100, 50, mainCharacter.y));
 
-                blocks.push(new Block(game.width, random, 100, 50));
-
-                game.startGame(blocks);
+                
+                game.startGame();
             }
             
         </script>
