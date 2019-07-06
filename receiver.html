@@ -33,33 +33,29 @@
             <span id="dificulty_value"></span>
             <canvas id="div_canvas" width="800" height="300"></canvas>
         </div>
-        <script>
-            var canvas = document.getElementById("div_canvas");
-            var ctx = canvas.getContext("2d");
-            var height = canvas.height;
-            var width = canvas.width;
-            var position = Math.floor(height / 2);
-            var block = [];
-            var game = true;
-            var score = 0;
-            var score_value = document.getElementById("score_value");
-            var dificulty_value = document.getElementById("dificulty_value");
-            var dificulty = 1;
+        <script>    
+            var socket = io('http://localhost:8080');
 
+            
+            var game = new Game();
+            var mainCharacter = new MainCharacter();
             var background = new Image();
-            // background.src = "img/background.png";
+                // background.src = "img/background.png";
             background.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/public/img/background.png";
-            var backgroundPattern = ctx.createPattern(background, 'repeat');
+            var backgroundPattern = game.ctx.createPattern(background, 'repeat');
 
             var foreground = new Image();
-            // foreground.src = "img/foreground.png";
+                // foreground.src = "img/foreground.png";
             foreground.src = "https://raw.githubusercontent.com/Beelink/tetrisrace/master/public/img/foreground.png";
-            var foregroundPattern = ctx.createPattern(foreground, 'repeat');
+            var foregroundPattern = game.ctx.createPattern(foreground, 'repeat'); 
+            var position = Math.floor(game.height / 2);
+                var blocks = [];
+                
+                var score = 0;
+                var score_value = document.getElementById("score_value");
+                var dificulty_value = document.getElementById("dificulty_value");
+                var dificulty = 1;        
             
-            var mainCharacter = new MainCharacter();
-    
-            var socket = io('http://localhost:8080');
-    
             socket.on('send-message', function (data) {
                 console.log("done-message = " + data['message']);
                 switch(data['message']) {
@@ -85,20 +81,20 @@
                 let selfBlock = this;
     
                 this.drawBlock = function() {
-                    ctx.beginPath();
-                    ctx.fillStyle = foregroundPattern;
-                    ctx.fillRect(selfBlock.x, selfBlock.y, selfBlock.width, selfBlock.height);
-                    ctx.closePath();
+                    game.ctx.beginPath();
+                    game.ctx.fillStyle = foregroundPattern;
+                    game.ctx.fillRect(this.x, this.y, this.width, this.height);
+                    game.ctx.closePath();
                 }
     
                 this.draw = function() {
-                    selfBlock.drawBlock();
-                    selfBlock.x -= dificulty;
+                    this.drawBlock.call(this);
+                    this.x -= dificulty;
 
-                    if(selfBlock.x < - selfBlock.width) {
-                        for(let i = 0; i < block.length; i++) {
-                            if(block[i] == selfBlock) {
-                                block.splice(i, 1);
+                    if(this.x < - this.width) {
+                        for(let i = 0; i < blocks.length; i++) {
+                            if(blocks[i] == this){
+                                game.removeBlock(blocks, i);
                             }
                         }
                     }
@@ -106,115 +102,154 @@
             }
     
             function MainCharacter() {
+                console.log(game)
                 this.x = 0;
-                this.y = Math.floor(height / 2);
+                this.y = Math.floor((game.height) / 2);
                 this.width = 100;
                 this.height = 50;
                 this.color = "black"
-                let self = this;
-                this.targetX = self.x;
-                this.targetY = self.y;
+                this.targetX = this.x;
+                this.targetY = this.y;
+                
     
                 this.drawMainCharacter = function() {
-                    if(self.x < self.targetX) {
-                        self.x += 10;
+                    if(this.x < this.targetX) {
+                        this.x += 10;
                     }
-                    if(self.x > self.targetX) {
-                        self.x -= 10;
+                    if(this.x > this.targetX) {
+                        this.x -= 10;
                     }
-                    if(self.y < self.targetY) {
-                        self.y += 10;
+                    if(this.y < this.targetY) {
+                        this.y += 10;
                     }
-                    if(self.y > self.targetY) {
-                        self.y -= 10;
+                    if(this.y > this.targetY) {
+                        this.y -= 10;
                     }
 
-                    ctx.beginPath();
-                    ctx.fillStyle = foregroundPattern;
-                    ctx.fillRect(self.x, self.y, self.width, self.height);
-                    ctx.closePath();
+                    game.ctx.beginPath();
+                    game.ctx.fillStyle = foregroundPattern;
+                    game.ctx.fillRect(this.x, this.y, this.width, this.height);
+                    game.ctx.closePath();
+                    // console.log(this)
                 }
-    
+                let drawMC = this.drawMainCharacter.bind(this);
+
                 this.draw = function() {
-                    self.drawMainCharacter();
+                    // console.log(this)
+                    // this.drawMainCharacter.call(this);
+                    drawMC();
                 }
     
                 this.right = function() {
-                    if(self.targetX + self.width < width) {
-                        self.targetX += 50;
+                    if(this.targetX + this.width < width) {
+                        this.targetX += 50;
                     }
                 }
     
                 this.left = function() {
-                    if(self.targetX > 0) {
-                        self.targetX += -50;
+                    if(this.targetX > 0) {
+                        this.targetX += -50;
                     }
                 }
     
                 this.down = function() {
-                    if(self.targetY + self.height < height) {
-                        self.targetY += 50;
+                    if(this.targetY + this.height < height) {
+                        this.targetY += 50;
                     }
                 }
     
                 this.up = function() {
-                    if(self.targetY > 0) {
-                        self.targetY += -50;
+                    if(this.targetY > 0) {
+                        this.targetY += -50;
                     }
                 }
             }
     
-            function animation() {
-                if(game) {
-                    ctx.fillStyle = backgroundPattern;
-                    ctx.fillRect(0, 0, width, height);
-                    mainCharacter.draw();
-                    for(let i = 0; i < block.length; i++) { 
-                        if(block[i].y == mainCharacter.y) {
-                            if(block[i].x < mainCharacter.x + mainCharacter.width && block[i].x + block[i].width > mainCharacter.x) {
-                                game = false;
+            function Game(){
+                this.canvas = document.getElementById("div_canvas");
+                this.ctx = this.canvas.getContext("2d");
+                this.height = this.canvas.height;
+                this.width = this.canvas.width;
+                this.play = true;
+                                
+                this.removeBlock = function(items, i){
+                    items.splice(i, 1);
+                }
+        
+                // this.addedBlock = function(items, elem){
+                //     items.push(elem);
+                // }
+            
+    
+                this.animation = function() {
+                    // console.log(this);
+                    if(this.play) {
+                        this.ctx.fillStyle = backgroundPattern;
+                        this.ctx.fillRect(0, 0, game.width, game.height);
+                        mainCharacter.draw.call(mainCharacter);
+                        for(let i = 0; i < blocks.length; i++) { 
+                            if(blocks[i].y == mainCharacter.y) {
+                                if(blocks[i].x < mainCharacter.x + mainCharacter.width && blocks[i].x + blocks[i].width > mainCharacter.x) {
+                                    this.play = false;
+                                }
                             }
+                            blocks[i].draw.call(blocks[i]);
                         }
-                        block[i].draw();
+                        score++;
+                        score_value.innerHTML = "Score: " + score;
+
+                        dificulty += 0.001;
+                        dificulty_value.innerHTML = "Speed: x" + Math.round(dificulty * 100) / 100;
+                    } else {
+                        score_value.innerHTML = "Crash! Total: " + score; 
+                                
+                        this.ctx.fillStyle = foregroundPattern;
+                        this.ctx.fillRect(0, 0, this.width, this.height);
                     }
-                    score++;
-                    score_value.innerHTML = "Score: " + score;
-
-                    dificulty += 0.001;
-                    dificulty_value.innerHTML = "Speed: x" + Math.round(dificulty * 100) / 100;
-                } else {
-                    score_value.innerHTML = "Crash! Total: " + score; 
-                            
-                    ctx.fillStyle = foregroundPattern;
-                    ctx.fillRect(0, 0, width, height);
+                    // requestAnimationFrame(this.animation);
                 }
-            }
-    
-            function startGame() {
-                let timeId = setInterval(function() {
-                    if(!game) clearInterval(timeId);
 
-                    let random = 50 * getRandomInt(1, 6);
-                    block.push(new Block(width, random, 100, 50));
-                }, 1000);
+                let animationBind = this.animation.bind(this);
+        
+                this.startGame = function() {
+                    // console.log(this);
+                    let timeId = setInterval(function() {
+                        if(!game) clearInterval(timeId);
 
-                let timeAnimation = setInterval(function() {
-                    if(!game) clearInterval(timeAnimation);
-                    animation();
-                }, 10);
-            }
+                        let random = 50 * getRandomInt(1, 6);
+                        blocks.push(new Block(this.width, random, 100, 50));
+                    }, 5000);
+
+                    let timeAnimation = setInterval(function() {
+                        if(!game) clearInterval(timeAnimation);
+                        animationBind();
+                    }, 10);
+                    // requestAnimationFrame(this.animation.bind(this));
+                    // requestAnimationFrame(animationBind)
+                
+                }
+        
+                
+                  
+            }   
     
             function getRandomInt(min, max) {
                 return Math.floor(Math.random() * (max - min)) + min;
             }
-    
+
             function restart() {
                 location.reload();
-            }   
-    
+            } 
+
             window.onload = () => {
-                startGame();
+                let random = 50 * getRandomInt(1, 6);
+                var start = game.startGame.bind(game);
+
+                blocks.push(new Block(game.width, random, 100, 50));
+
+                game.startGame(blocks);
             }
+            
         </script>
     </body>
 </html>
