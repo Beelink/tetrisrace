@@ -7,6 +7,21 @@
 		<script type="text/javascript" charset="utf-8">
 			var socket = io.connect('http://localhost:8080/');
 
+			socket.on('send-message', function (data) {
+                switch(data['message']) {
+                case "back-complexity": changeComplexityButton(data['value']);
+                    break;
+                }
+			});
+			
+			function changeComplexityButton(bool) {
+				if(bool) {
+					document.getElementById('complexity-btn').innerHTML = "💚";
+				} else {
+					document.getElementById('complexity-btn').innerHTML = "😡";
+				}
+			}
+
 			function sendMessage(sendedMessage) {
 				socket.emit('request-message', { message: sendedMessage });
 			}
@@ -24,68 +39,93 @@
 					sendMessage('right');
 				} else if (e.keyCode == '13') {
 					sendMessage('restart');
+				} else if (e.keyCode == '32') {
+					sendMessage('complexity');
 				}
 			}
 
 			document.onkeydown = checkKey;
 		</script>
 		<style type="text/css" media="screen">
-			#main-container {
-				position: relative;
+			* {
+				user-select: none;
+				font-family: Helvetica;
 			}
 
-			img {
+			body, .container {
 				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100vh;
+				margin: 0;
+				padding: 0;
+				background-color: lightgray;
 			}
 
-			img:hover {
+			.container {
+				display: flex;
+				flex-direction: column;
+			}
+
+			.row {
+				flex: 5;
+				display: flex;
+				flex-direction: row;
+			}
+
+			.square {
+				flex: 4;
+				display: flex;
+				text-align: center;
+				justify-content: center;
+				flex-flow: column wrap;
+				margin: 16px;
+				border: 6px solid black;
+				background-color: white;
+				border-radius: 32px;
+				font-size: 5vw;
+			}
+
+			.square:hover {
+				opacity: 0.75;
+			}
+
+			.square:active {
 				opacity: 0.5;
 			}
 
-			img:active {
-				transform: scale(0.9);
+			.square.disabled {
+				opacity: 0;
 			}
 
-			#left-btn {
-				left: 16px;
-				top: calc(50% - 75px);
-			}
-
-			#right-btn {
-				right: 16px;
-				top: calc(50% - 75px);
-	
-			}
-
-			#up-btn {
-				left: calc(50% - 75px);
-				top: 16px;
-			}
-
-			#down-btn {
-				left: calc(50% - 75px);
-				bottom: 16px;
-			}
-
-			#restart-btn {
-				left: calc(50% - 75px);
-				top: calc(50% - 75px);
-			}
-
-			#complexity-btn {
-				right: 16px;
-				top: 16px;
-			}
+			/* header, footer {
+				height: 50px;
+				width: 100%;
+				font-size: 32px;
+				text-align: center;
+			} */
 		</style>
 	</head>
 	<body> 
-		<main class="main-container">
-			<img src="img/easy.png" id="complexity-btn" onclick="sendMessage('complexity')">
-			<img src="img/left.png" id="left-btn" onclick="sendMessage('left')">
-			<img src="img/right.png" id="right-btn" onclick="sendMessage('right')">
-			<img src="img/up.png" id="up-btn" onclick="sendMessage('up')">
-			<img src="img/down.png" id="down-btn" onclick="sendMessage('down')">
-			<img src="img/restart.png" id="restart-btn" onclick="sendMessage('restart')">
-		</main>
+		<div class="container">
+			<!-- <header>This is the header</header> -->
+			<div class="row">
+				<div class="square disabled">1x1</div>
+				<div class="square" onclick="sendMessage('up')">👆</div>
+				<div class="square" id="complexity-btn" onclick="sendMessage('complexity')">💚</div>
+			</div>
+			<div class="row">
+				<div class="square" onclick="sendMessage('left')">👈</div>
+				<div class="square" onclick="sendMessage('restart')">🔁</div>
+				<div class="square" onclick="sendMessage('right')">👉</div>
+			</div>
+			<div class="row">
+				<div class="square disabled">3x1</div>
+				<div class="square" onclick="sendMessage('down')">👇</div>
+				<div class="square disabled">3x3</div>
+			</div>
+			<!-- <footer>This is the footer</footer> -->
+		</div>
 	</body>
 </html>

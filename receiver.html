@@ -7,49 +7,47 @@
         <title>Receiver</title>
         <script src="/socket.io/socket.io.js"></script>
         <style>
-            div {
-                width: 800px;
-                margin: 50px auto;
+            body {
+                background-color: lightgray;
             }
 
-            #div_canvas {
-                border: 5px solid black;
+            .container {
+                width: 800px;
+                margin: 16px;
+				border: 6px solid black;
+				background-color: white;
+                border-radius: 32px;
+                text-align: center;
+                width: calc(100% - 32px);
+            }
+
+            canvas {
+                margin: 16px;
+				border: 6px solid black;
+				background-color: white;
+                border-radius: 32px;
+                width: calc(100% - 32px);
             }
 
             span {
                 font-weight: bold;
                 font-family: Helvetica;
-                font-size: 32px;
-            }
-
-            #dificulty_value {
-                float: right;
-            }
-
-            #type_difficulty{
-                width: 100px;
-                height: 50px;
-                background: rgb(0, 165, 0);
-                border: none;
-                font-size: 20px;
-                color: white;
-                position: absolute;
-                left: 50%;
-                margin: -25px 0 0 -50px; 
+                font-size: 5vw;
+                display: inline-block;
+                margin: 16px;
             }
         </style>
     </head>
     <body> 
-        <div>
+        <div class="container">
             <span id="score_value"></span>
             <span id="dificulty_value"></span>
-            <button id="type_difficulty" onclick="changeTypeDifficulty()">Easy</button>
-            <canvas id="div_canvas" width="800" height="300"></canvas>
+            <span id="complexity_value">💚 Easy</span>
         </div>
+        <canvas id="div_canvas" width="800" height="300"></canvas>
         <script>    
             var socket = io('http://localhost:8080');
 
-            
             var game = new Game();
             var mainCharacter = new MainCharacter();
             var background = new Image();
@@ -82,18 +80,10 @@
                     break;
                 case "restart": restart();
                     break;
-                case "complexity": toggleComplexity();
+                case "complexity": changeTypeDifficulty();
                     break;
                 }
             });
-
-            function toggleComplexity() {
-                if(game.easy_complexity) {
-                    game.easy_complexity = false;
-                } else {
-                    game.easy_complexity = true;
-                }
-            }
     
             function Block(x, y, width, height, mainY) {
                 this.x = x;
@@ -105,7 +95,7 @@
     
                 this.drawBlock = function() {
                     game.ctx.beginPath();
-                    game.ctx.fillStyle = foregroundPattern;
+                    game.ctx.fillStyle = "rgb(0, 0, 0)";
                     game.ctx.fillRect(this.x, this.y, this.width, this.height);
                     game.ctx.closePath();
                 }
@@ -113,10 +103,10 @@
                 this.draw = function() {
                     this.drawBlock.call(this);
                     this.x -= dificulty;
-                    if(!game.easy_complexity){
-                        if(this.y == this.mainY){
+                    if(!game.easy_complexity) {
+                        if(this.y == this.mainY) {
                             return ;
-                        }else if(this.y > this.mainY){
+                        } else if(this.y > this.mainY) {
                             this.y -= 0.5;
                         }else{
                             this.y += 0.5;
@@ -125,7 +115,7 @@
 
                     if(this.x < - this.width) {
                         for(let i = 0; i < blocks.length; i++) {
-                            if(blocks[i] == this){
+                            if(blocks[i] == this) {
                                 game.removeBlock(blocks, i);
                             }
                         }
@@ -158,7 +148,7 @@
                     }
 
                     game.ctx.beginPath();
-                    game.ctx.fillStyle = foregroundPattern;
+                    game.ctx.fillStyle = "rgb(0, 0, 0)";;
                     game.ctx.fillRect(this.x, this.y, this.width, this.height);
                     game.ctx.closePath();
                 }
@@ -207,7 +197,7 @@
     
                 this.animation = function() {
                     if(this.play) {
-                        this.ctx.fillStyle = backgroundPattern;
+                        this.ctx.fillStyle = "rgb(255, 255, 255)";
                         this.ctx.fillRect(0, 0, game.width, game.height);
                         mainCharacter.draw.call(mainCharacter);
                         for(let i = 0; i < blocks.length; i++) { 
@@ -219,21 +209,21 @@
                             blocks[i].draw.call(blocks[i]);
                         }
                         score++;
-                        score_value.innerHTML = "Score: " + score;
+                        score_value.innerHTML = "💯 " + score;
 
                         dificulty += 0.001;
-                        dificulty_value.innerHTML = "Speed: x" + Math.round(dificulty * 100) / 100;
+                        dificulty_value.innerHTML = "⚡ x" + Math.round(dificulty * 100) / 100;
                     } else {
-                        score_value.innerHTML = "Crash! Total: " + score; 
+                        score_value.innerHTML = "💥 " + score; 
                                 
-                        this.ctx.fillStyle = foregroundPattern;
+                        this.ctx.fillStyle = "rgb(184, 63, 72)";
                         this.ctx.fillRect(0, 0, this.width, this.height);
                     }
                 }
                 
                 this.startGame = function() {
                     let animationGame = game.animation.bind(game);
-                    function addedBlock(){
+                    function addedBlock() {
                         let random = 50 * getRandomInt(1, 6);
                         blocks.push(new Block(this.width, random, 100, 50, mainCharacter.y));
                     }
@@ -245,9 +235,7 @@
                     let timeId = setInterval(addedBlock.bind(this), 5000);
 
                     let timeAnimation = setInterval(callAnimationGame.bind(this), 10);
-                
                 }
-                  
             }   
     
             function getRandomInt(min, max) {
@@ -259,22 +247,20 @@
             } 
 
             function changeTypeDifficulty() {
-                if(document.getElementById("type_difficulty").innerHTML == "Easy"){
+                if(game.easy_complexity) {
                     game.easy_complexity = false;
-                    document.getElementById("type_difficulty").innerHTML = "Hard";
-                    document.getElementById("type_difficulty").style.background = "red";
+                    document.getElementById('complexity_value').innerHTML = "😡 Hard";
                 } else {
                     game.easy_complexity = true;
-                    document.getElementById("type_difficulty").innerHTML = "Easy";
-                    document.getElementById("type_difficulty").style.background = "green";
+                    document.getElementById('complexity_value').innerHTML = "💚 Easy";
                 }
+                socket.emit('request-message', { message: "back-complexity", value: game.easy_complexity });
             }
 
             window.onload = () => {
                 let random = 50 * getRandomInt(1, 6);
                 blocks.push(new Block(game.width, random, 100, 50, mainCharacter.y));
 
-                
                 game.startGame();
             }
             

@@ -29,7 +29,6 @@ app.get('/receiver', function(req, res, next) {
 
 io.sockets.on('connection', function (socket) {
   socket.on('request-message', function (data){
-      io.sockets.emit('send-message', { message: data['message'] });
-      console.log("send-message = " + data['message']);
+      io.sockets.emit('send-message', { message: data['message'], value: data['value'] });
   });
 });
