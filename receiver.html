@@ -62,141 +62,211 @@
                     break;
                 case "restart": restart();
                     break;
-                case "complexity": changeTypeDifficulty();
+                case "complexity": g.toggleComplexity();
                     break;
                 }
             });
 
-            function HardBlock() {
+            function HardBlock(x, y, width, height, game) {
 
             }
     
-            function EasyBlock(x, y, width, height, game) {
-                this.x = x;
-                this.y = y;
-                this.width = width;
-                this.height = height;
-                this.color = "black"
+            function EasyBlock(x1, y1, width1, height1, game) {
+                let x = x1;
+                let y = y1;
+                let width = width1;
+                let height = height1;
+
+                this.getWidth = function() {
+                    return width;
+                }
+
+                this.getHeight = function() {
+                    return height;
+                }
+
+                this.getX = function() {
+                    return x;
+                }
+            
+                this.getY = function() {
+                    return y;
+                }
     
                 this.draw = function() {
-                    this.x -= game.dificulty;
+                    x -= game.getDificulty();
 
-                    game.ctx.beginPath();
-                    game.ctx.fillStyle = "rgb(0, 0, 0)";
-                    game.ctx.fillRect(this.x, this.y, this.width, this.height);
-                    game.ctx.closePath();
+                    game.getCtx().beginPath();
+                    game.getCtx().fillStyle = "rgb(0, 0, 0)";
+                    game.getCtx().fillRect(x, y, width, height);
+                    game.getCtx().closePath();
                 }
             }
 
             function MainCharacter(game) {
-                this.x = 0;
-                this.y = Math.floor((game.height) / 2);
-                this.width = 100;
-                this.height = 50;
-                this.targetX = this.x;
-                this.targetY = this.y;
+                let x = 0;
+                let y = Math.floor(game.getCanvasHeight() / 2);
+                let width = 100;
+                let height = 50;
+                let targetX = x;
+                let targetY = y;
+
+                this.getWidth = function() {
+                    return width;
+                }
+
+                this.getHeight = function() {
+                    return height;
+                }
+
+                this.getX = function() {
+                    return x;
+                }
+
+                this.getY = function() {
+                    return y;
+                }
                 
                 this.draw = function() {
-                    if(this.x < this.targetX) {
-                        this.x += 10;
+                    if(x < targetX) {
+                        x += 10;
                     }
-                    if(this.x > this.targetX) {
-                        this.x -= 10;
+                    if(x > targetX) {
+                        x -= 10;
                     }
-                    if(this.y < this.targetY) {
-                        this.y += 10;
+                    if(y < targetY) {
+                        y += 10;
                     }
-                    if(this.y > this.targetY) {
-                        this.y -= 10;
+                    if(y > targetY) {
+                        y -= 10;
                     }
 
-                    game.ctx.beginPath();
-                    game.ctx.fillStyle = "rgb(0, 0, 0)";;
-                    game.ctx.fillRect(this.x, this.y, this.width, this.height);
-                    game.ctx.closePath();
+                    game.getCtx().beginPath();
+                    game.getCtx().fillStyle = "rgb(0, 0, 0)";;
+                    game.getCtx().fillRect(x, y, width, height);
+                    game.getCtx().closePath();
                 }
     
                 this.right = function() {
-                    if(this.targetX + this.width < game.width) {
-                        this.targetX += 50;
+                    if(targetX + width < game.getCanvasWidth()) {
+                        targetX += 50;
                     }
                 }
     
                 this.left = function() {
-                    if(this.targetX > 0) {
-                        this.targetX += -50;
+                    if(targetX > 0) {
+                        targetX += -50;
                     }
                 }
     
                 this.down = function() {
-                    if(this.targetY + this.height < game.height) {
-                        this.targetY += 50;
+                    if(targetY + height < game.getCanvasHeight()) {
+                        targetY += 50;
                     }
                 }
     
                 this.up = function() {
-                    if(this.targetY > 0) {
-                        this.targetY += -50;
+                    if(targetY > 0) {
+                        targetY += -50;
                     }
                 }
             }
     
             function Game(canvas, scoreText, dificultyText, complexityText) {
-                this.ctx = canvas.getContext("2d");
-                this.height = canvas.height;
-                this.width = canvas.width;
-                this.play = true;
-                this.easy_complexity = true;
-                this.mainCharacter = new MainCharacter(this);
-                this.blocks = [];
-                this.score = 0;
-                this.dificulty = 1;
+                let ctx = canvas.getContext("2d");
+                let height = canvas.height;
+                let width = canvas.width;
+                let play = true;
+                let easyComplexity = true;
+                let blocks = [];
+                let score = 0;
+                let dificulty = 1;
+                let self = this;
+                let mainCharacter = null;
+
+                this.toggleComplexity = function() {
+                    if(easyComplexity) {
+                        easyComplexity = false;
+                        complexityText.innerHTML = "😡 Hard";
+                    } else {
+                        easyComplexity = true;
+                        complexityText.innerHTML = "💚 Easy";
+                    }
+                    socket.emit('request-message', { message: "back-complexity", value: easyComplexity });
+                }
 
                 this.left = function() {
-                    this.mainCharacter.left();
+                    mainCharacter.left();
                 }
 
                 this.right = function() {
-                    this.mainCharacter.right();
+                    mainCharacter.right();
                 }
 
                 this.up = function() {
-                    this.mainCharacter.up();
+                    mainCharacter.up();
                 }
 
                 this.down = function() {
-                    this.mainCharacter.down();
+                    mainCharacter.down();
+                }
+
+                this.getCtx = function() {
+                    return ctx;
+                }
+
+                this.getCanvasHeight = function() {
+                    return height;
+                }
+
+                this.getCanvasWidth = function() {
+                    return width;
+                }
+
+                this.getDificulty = function() {
+                    return dificulty;
                 }
     
                 this.loop = function() {
-                    if(this.play) {
-                        this.ctx.fillStyle = "rgb(255, 255, 255)";
-                        this.ctx.fillRect(0, 0, this.width, this.height);
-                        this.mainCharacter.draw();
-                        for(let i = 0; i < this.blocks.length; i++) { 
-                            if(this.blocks[i].y == this.mainCharacter.y) {
-                                if(this.blocks[i].x < this.mainCharacter.x + this.mainCharacter.width && this.blocks[i].x + this.blocks[i].width > this.mainCharacter.x) {
-                                    this.play = false;
+                    if(play) {
+                        ctx.fillStyle = "rgb(255, 255, 255)";
+                        ctx.fillRect(0, 0, width, height);
+                        mainCharacter.draw();
+                        for(let i = 0; i < blocks.length; i++) { 
+                            if(blocks[i].getX() + blocks[i].getWidth() < 0) {
+                                blocks.splice(i, 1);
+                            } else {
+                                if(blocks[i].getY() == mainCharacter.getY()) {
+                                    if(blocks[i].getX() < mainCharacter.getX() + mainCharacter.getWidth() && blocks[i].getX() + blocks[i].getWidth() > mainCharacter.getX()) {
+                                        play = false;
+                                    }
                                 }
-                            }
-                            this.blocks[i].draw();
+                                blocks[i].draw();
+                            }                            
                         }
-                        this.score++;
-                        scoreText.innerHTML = "💯 " + this.score;
+                        score++;
+                        scoreText.innerHTML = "💯 " + score;
 
-                        this.dificulty += 0.001;
-                        dificultyText.innerHTML = "⚡ x" + Math.round(this.dificulty * 100) / 100;
+                        dificulty += 0.001;
+                        dificultyText.innerHTML = "⚡ x" + Math.round(dificulty * 100) / 100;
                     } else {
-                        scoreText.innerHTML = "💥 " + this.score; 
+                        scoreText.innerHTML = "💥 " + score; 
                                 
-                        this.ctx.fillStyle = "rgb(184, 63, 72)";
-                        this.ctx.fillRect(0, 0, this.width, this.height);
+                        ctx.fillStyle = "rgb(184, 63, 72)";
+                        ctx.fillRect(0, 0, width, height);
                     }
                 }
 
                 this.createEasyBlock = function() {
                     let random = 50 * getRandomInt(1, 6);
-                    this.blocks.push(new EasyBlock(this.width, random, 100, 50, this));
+                    blocks.push(new EasyBlock(width, random, 100, 50, self));
+                }
+
+                this.startGame = function() {
+                    mainCharacter = new MainCharacter(self);
+
+                    setInterval(this.loop, 10);
+                    setInterval(this.createEasyBlock, 3000);
                 }
             }   
     
@@ -208,24 +278,11 @@
                 location.reload();
             } 
 
-            // function changeTypeDifficulty() {
-            //     if(game.easy_complexity) {
-            //         game.easy_complexity = false;
-            //         document.getElementById('complexity_value').innerHTML = "😡 Hard";
-            //     } else {
-            //         game.easy_complexity = true;
-            //         document.getElementById('complexity_value').innerHTML = "💚 Easy";
-            //     }
-            //     socket.emit('request-message', { message: "back-complexity", value: game.easy_complexity });
-            // }
-
             window.onload = init();
 
             function init() {
                 g = new Game(document.getElementById("div_canvas"), document.getElementById("score_value"), document.getElementById("dificulty_value"), document.getElementById("complexity_value"));
-                
-                setInterval(g.loop, 10);
-                setInterval(g.createEasyBlock, 100);
+                g.startGame();
             }
         </script>
     </body>
