@@ -161,6 +161,10 @@
                 this.getY = function() {
                     return y;
                 }
+
+                this.getTargetY = function() {
+                    return targetY;
+                }
                 
                 this.draw = function() {
                     if(x < targetX) {
@@ -218,6 +222,7 @@
                 let dificulty = 1;
                 let self = this;
                 let mainCharacter = null;
+                let timer = Date.now();
 
                 this.toggleComplexity = function() {
                     if(easyComplexity) {
@@ -262,7 +267,7 @@
                     return dificulty;
                 }
     
-                this.loop = function() {
+                let loop = function() {
                     if(play) {
                         ctx.fillStyle = "rgb(255, 255, 255)";
                         ctx.fillRect(0, 0, width, height);
@@ -282,26 +287,41 @@
                         score++;
                         scoreText.innerHTML = "💯 " + score;
 
-                        dificulty += 0.001;
+                        dificulty += 0.0025;
                         dificultyText.innerHTML = "⚡ x" + Math.round(dificulty * 100) / 100;
+
+                        if(Date.now() - timer > 5000 * (1 / dificulty)) {
+                            timer = Date.now();
+                            if(easyComplexity) {
+                                createEasyBlock();
+                            } else {
+                                createHardBlock();
+                            }
+                        }
                     } else {
                         scoreText.innerHTML = "💥 " + score; 
                                 
                         ctx.fillStyle = "rgb(240, 58, 23)";
                         ctx.fillRect(0, 0, width, height);
                     }
+
+                    window.requestAnimationFrame(loop);
                 }
 
-                this.createEasyBlock = function() {
+                let createEasyBlock = function() {
                     let random = 50 * getRandomInt(1, 6);
                     blocks.push(new EasyBlock(width, random, 100, 50, self));
+                }
+
+                let createHardBlock = function() {
+                    let random = 50 * getRandomInt(1, 6);
+                    blocks.push(new HardBlock(width, random, 100, 50, self, mainCharacter.getTargetY()));
                 }
 
                 this.startGame = function() {
                     mainCharacter = new MainCharacter(self);
 
-                    setInterval(this.loop, 10);
-                    setInterval(this.createEasyBlock, 3000);
+                    window.requestAnimationFrame(loop);
                 }
             }   
     
