@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Emoji Racing</title>
+    <style type="text/css" media="screen">
+        * {
+            user-select: none;
+            font-family: Helvetica;
+        }
+
+        body {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            background-color: lightgray;
+        }
+
+        #start-div div {
+            margin: 16px;
+            padding: 16px;
+            border: 6px solid black;
+            background-color: white;
+            border-radius: 32px;
+            font-size: 5vh;
+            vertical-align: middle;
+            font-weight: bold;
+        }
+
+        #start-div div:hover {
+            opacity: 0.75;
+        }
+
+        #start-div div:active {
+            opacity: 0.5;
+        }
+
+        header {
+            font-size: 5vh;
+            font-weight: bold;
+            text-align: center;
+            padding: 16px;
+        }
+
+        #start-div, #controller-div, #game-div {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        #controller-div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #controller-div .row {
+            flex: 3;
+            display: flex;
+            flex-direction: row;
+        }
+
+        #controller-div .row .square {
+            padding: 16px;
+            flex: 4;
+            display: flex;
+            text-align: center;
+            justify-content: center;
+            flex-flow: column wrap;
+            margin: 16px;
+            border: 6px solid black;
+            background-color: white;
+            border-radius: 32px;
+            font-size: 5vh;
+        }
+
+        #controller-div .row .square:hover {
+            opacity: 0.75;
+        }
+
+        #controller-div .row .square:active {
+            opacity: 0.5;
+        }
+
+        #controller-div .row .square.disabled {
+            opacity: 0;
+        }
+
+        #game-div .container {
+            width: 800px;
+            margin: 16px;
+            border: 6px solid black;
+            background-color: white;
+            border-radius: 32px;
+            text-align: center;
+            width: calc(100% - 44px);
+        }
+
+        #game-div canvas {
+            margin: 16px;
+            border: 6px solid black;
+            background-color: white;
+            border-radius: 32px;
+            width: calc(100% - 44px);
+        }
+
+        #game-div .container span {
+            font-weight: bold;
+            font-family: Helvetica;
+            font-size: 5vh;
+            display: inline-block;
+            margin: 16px;
+        }
+    </style>
+</head>
+<body>
+    <header>😋 Emoji Racing</header>
+    <div id="start-div">
+        <div onclick="startAsGame()">🎳 1. Game</div>
+        <div onclick="startAsController()">🎮 2. Controller</div>
+    </div>
+    <div id="controller-div" style="display: none;">
+        <div class="row">
+            <div class="square disabled">1x1</div>
+            <div class="square" onclick="sendMessage('controller-up')">👆</div>
+            <div class="square" id="complexity-btn" onclick="sendMessage('controller-complexity')">💚</div>
+        </div>
+        <div class="row">
+            <div class="square" onclick="sendMessage('controller-left')">👈</div>
+            <div class="square" onclick="sendMessage('controller-restart')">🔁</div>
+            <div class="square" onclick="sendMessage('controller-right')">👉</div>
+        </div>
+        <div class="row">
+            <div class="square disabled">3x1</div>
+            <div class="square" onclick="sendMessage('controller-down')">👇</div>
+            <div class="square disabled">3x3</div>
+        </div>
+    </div>
+    <div id="game-div" style="display: none;">
+        <div class="container">
+            <span id="score_value">💯 0</span>
+            <span id="dificulty_value">⚡ x1</span>
+            <span id="complexity_value">💚 Easy</span>
+        </div>
+        <canvas id="div_canvas" width="800" height="300"></canvas>
+    </div>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

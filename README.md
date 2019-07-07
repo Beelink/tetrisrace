@@ -1,13 +1,12 @@
-<h1>tetrisrace</h1>
+WebRTC Racing Game
+======
 
-Передача сигналов без сохранения на сервере.
+TO RUN
+======
 
-<h4>Приложение использует node.js (express, socket.io) на сервере.</h4>
-
-Сервер: `node app.js`
-
-Страница контроллера: `http://localhost:8080/`<br>
-Вы можете посылать сигналы на страницу игры нажимая на кнопки.<br>
-Клавиши: стрелки - перемещение игрока, Return - рестарт.<br><br>
-
-Страница игры: `http://localhost:8080/receiver`
+1. Run the websocket server: `node ws-server.js`.
+2. Visit index.html on 2 tabs on the same computer.
+3. Start as game.
+4. Start as controller.
+5. Press the button.
+6. Play!
