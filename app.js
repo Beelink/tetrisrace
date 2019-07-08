@@ -435,12 +435,12 @@ function Game(canvas, scoreText, dificultyText, complexityText) {
   }
 
   let createEasyBlock = function() {
-      let random = 50 * getRandomInt(1, 6);
+      let random = 50 * getRandomInt(0, 6);
       blocks.push(new EasyBlock(width, random, 100, 50, this));
   }
 
   let createHardBlock = function() {
-      let random = 50 * getRandomInt(1, 6);
+      let random = 50 * getRandomInt(0, 6);
       blocks.push(new HardBlock(width, random, 100, 50, this, mainCharacter.getTargetY()));
   }
 
