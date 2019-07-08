@@ -1,4 +1,4 @@
-#WebRTC Racing Game
+<h3>WebRTC Racing Game</h3>
 
 To Run
 ======
