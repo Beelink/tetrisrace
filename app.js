@@ -346,7 +346,6 @@ function Game(canvas, scoreText, dificultyText, complexityText) {
   let blocks = [];
   let score = 0;
   let dificulty = 1;
-  let self = this;
   let mainCharacter = null;
   let timer = Date.now();
 
@@ -420,9 +419,9 @@ function Game(canvas, scoreText, dificultyText, complexityText) {
           if(Date.now() - timer > 5000 * (1 / dificulty)) {
               timer = Date.now();
               if(easyComplexity) {
-                  createEasyBlock();
+                  createEasyBlock.call(this);
               } else {
-                  createHardBlock();
+                  createHardBlock.call(this);
               }
           }
       } else {
@@ -432,23 +431,23 @@ function Game(canvas, scoreText, dificultyText, complexityText) {
           ctx.fillRect(0, 0, width, height);
       }
 
-      window.requestAnimationFrame(loop);
+      window.requestAnimationFrame(loop.bind(this));
   }
 
   let createEasyBlock = function() {
       let random = 50 * getRandomInt(1, 6);
-      blocks.push(new EasyBlock(width, random, 100, 50, self));
+      blocks.push(new EasyBlock(width, random, 100, 50, this));
   }
 
   let createHardBlock = function() {
       let random = 50 * getRandomInt(1, 6);
-      blocks.push(new HardBlock(width, random, 100, 50, self, mainCharacter.getTargetY()));
+      blocks.push(new HardBlock(width, random, 100, 50, this, mainCharacter.getTargetY()));
   }
 
   this.startGame = function() {
-      mainCharacter = new MainCharacter(self);
+      mainCharacter = new MainCharacter(this);
 
-      window.requestAnimationFrame(loop);
+      window.requestAnimationFrame(loop.bind(this));
   }
 }   
 
