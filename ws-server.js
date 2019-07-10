@@ -1,5 +1,5 @@
 var WebSocketServer = require('ws').Server;
-var wss = new WebSocketServer({ port: 8088 });
+var wss = new WebSocketServer({ host:'0.0.0.0', port: 8088 });
 
 var wsList = [];
 

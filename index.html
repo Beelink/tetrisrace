@@ -128,17 +128,17 @@
     <div id="controller-div" style="display: none;">
         <div class="row">
             <div class="square disabled">1x1</div>
-            <div class="square" onclick="sendMessage('controller-up')">👆</div>
-            <div class="square" id="complexity-btn" onclick="sendMessage('controller-complexity')">💚</div>
+            <div class="square" ontouchstart="sendMessage('controller-up')">👆</div>
+            <div class="square" id="complexity-btn" ontouchstart="sendMessage('controller-complexity')">💚</div>
         </div>
         <div class="row">
-            <div class="square" onclick="sendMessage('controller-left')">👈</div>
-            <div class="square" onclick="sendMessage('controller-restart')">🔁</div>
-            <div class="square" onclick="sendMessage('controller-right')">👉</div>
+            <div class="square" ontouchstart="sendMessage('controller-left')">👈</div>
+            <div class="square" ontouchstart="sendMessage('controller-restart')">🔁</div>
+            <div class="square" ontouchstart="sendMessage('controller-right')">👉</div>
         </div>
         <div class="row">
             <div class="square disabled">3x1</div>
-            <div class="square" onclick="sendMessage('controller-down')">👇</div>
+            <div class="square" ontouchstart="sendMessage('controller-down')">👇</div>
             <div class="square disabled">3x3</div>
         </div>
     </div>

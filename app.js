@@ -25,7 +25,7 @@ peer.onicecandidate = function (e) {
   }));
 }
 
-var ws = new WebSocket('ws://localhost:8088');
+var ws = new WebSocket('ws://192.168.0.52:8088');
 ws.onopen = e => console.log('WEBSOCKET OPENED');
 ws.onclose = e => console.log('WEBSOCKET CLOSED');
 ws.onmessage = e => {
@@ -402,8 +402,11 @@ function Game(canvas, scoreText, dificultyText, complexityText) {
               if(blocks[i].getX() + blocks[i].getWidth() < 0) {
                   blocks.splice(i, 1);
               } else {
-                  if(blocks[i].getY() == mainCharacter.getY()) {
-                      if(blocks[i].getX() < mainCharacter.getX() + mainCharacter.getWidth() && blocks[i].getX() + blocks[i].getWidth() > mainCharacter.getX()) {
+                  if((blocks[i].getY() < mainCharacter.getY()) && (blocks[i].getY() + blocks[i].getHeight() > mainCharacter.getY()) || 
+                    (blocks[i].getY() == mainCharacter.getY()) || 
+                    ((blocks[i].getY() < mainCharacter.getY() + mainCharacter.getHeight()) && (blocks[i].getY() + blocks[i].getHeight() > mainCharacter.getY() + mainCharacter.getHeight())))
+                     {
+                      if((blocks[i].getX() < mainCharacter.getX() + mainCharacter.getWidth() && blocks[i].getX() + blocks[i].getWidth() > mainCharacter.getX())) {
                           play = false;
                       }
                   }
